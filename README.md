@@ -40,7 +40,7 @@ Frontend: [https://personalexpencemanager-frontend.vercel.app](https://personale
 ### Frontend Setup
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/expense-manager.git
+git clone https://github.com/rakib-utsho/FullStack_Expence-Manager
 
 # Navigate to frontend directory
 cd frontend
