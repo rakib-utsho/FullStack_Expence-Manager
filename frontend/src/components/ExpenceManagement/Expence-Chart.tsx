@@ -5,7 +5,6 @@ import { useMemo } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { Expense } from "./Expence"
 
-
 interface ExpenseChartProps {
   expenses: Expense[]
 }
@@ -91,7 +90,7 @@ export default function ExpenseChart({ expenses }: ExpenseChartProps) {
         </div>
 
         <div className="space-y-4">
-          <h4 className="text-md font-medium text-gray-700">Bar Chart</h4>
+          <h4 className="text-md font-medium text-gray-700">Breakdown</h4>
           <div className="space-y-4">
             {chartData.map(({ category, amount, percentage, color }) => (
               <div key={category} className="flex items-center gap-4">
@@ -104,10 +103,7 @@ export default function ExpenseChart({ expenses }: ExpenseChartProps) {
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
                       className="h-3 rounded-full transition-all duration-300"
-                      style={{
-                        width: `${percentage}%`,
-                        backgroundColor: color,
-                      }}
+                      style={{ width: `${percentage}%`, backgroundColor: color }}
                     />
                   </div>
                 </div>

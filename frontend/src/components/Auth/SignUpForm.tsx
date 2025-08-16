@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-
+import { useRegisterMutation } from "@/redux/service/auth/authApi"
+import Cookies from "js-cookie"
+import { useDispatch } from "react-redux"
+import { setUser } from "@/redux/features/auth"
+import { toast } from "sonner"
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -17,6 +21,9 @@ export default function SignupForm() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const dispatch = useDispatch()
+
+  const [register] = useRegisterMutation()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -29,6 +36,7 @@ export default function SignupForm() {
     e.preventDefault()
     setError("")
 
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
       return
@@ -39,14 +47,43 @@ export default function SignupForm() {
       return
     }
 
-  setIsLoading(true);
+    setIsLoading(true)
 
-  // TODO: Replace this with your actual signup logic
-  setTimeout(() => {
-    setIsLoading(false);
-    router.push("/");
-  }, 1000);
-}
+    try {
+      const res = await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      }).unwrap()
+
+      if (res.success) {
+        // Set cookies
+        Cookies.set("accessToken", res.data.accessToken, { expires: 7 })
+        Cookies.set("refreshToken", res.data.refreshToken, { expires: 30 })
+        
+        // Dispatch user data to Redux store
+        dispatch(
+          setUser({
+            user: res.data.user,
+            accessToken: res.data.accessToken,
+            refreshToken: res.data.refreshToken,
+          })
+        )
+        
+        // Show success message
+        toast.success(res.message || "Registration successful!")
+        
+        // Redirect to home page
+        router.push("/")
+      } else {
+        toast.error(res?.message || "Registration failed. Please try again.")
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Registration failed. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

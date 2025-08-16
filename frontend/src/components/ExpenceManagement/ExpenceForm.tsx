@@ -1,10 +1,7 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Expense } from "./Expence"
-
 
 interface ExpenseFormProps {
   onSubmit: (data: Omit<Expense, "id" | "createdAt">) => void
@@ -18,7 +15,7 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
     title: "",
     amount: "",
     category: "Food" as Expense["category"],
-    date: new Date().toISOString().split("T")[0],
+    date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
   })
 
   useEffect(() => {
@@ -27,7 +24,7 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
         title: initialData.title,
         amount: initialData.amount.toString(),
         category: initialData.category,
-        date: initialData.date,
+        date: initialData.date.split("T")[0],
       })
     }
   }, [initialData])
@@ -39,11 +36,14 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
       return
     }
 
+    // Convert date to ISO before submitting
+    const isoDate = new Date(formData.date).toISOString()
+
     onSubmit({
       title: formData.title.trim(),
       amount: Number.parseFloat(formData.amount),
       category: formData.category,
-      date: formData.date,
+      date: isoDate,
     })
 
     if (!isEditing) {
@@ -68,7 +68,9 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">{isEditing ? "Edit Expense" : "Add New Expense"}</h2>
+      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        {isEditing ? "Edit Expense" : "Add New Expense"}
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -79,8 +81,8 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
             type="text"
             id="title"
             value={formData.title}
-            onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter expense title"
             required
           />
@@ -96,8 +98,8 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
             step="0.01"
             min="0.01"
             value={formData.amount}
-            onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="0.00"
             required
           />
@@ -110,8 +112,8 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
           <select
             id="category"
             value={formData.category}
-            onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value as Expense["category"] }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={(e) => setFormData({ ...formData, category: e.target.value as Expense["category"] })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="Food">Food</option>
             <option value="Transport">Transport</option>
@@ -128,8 +130,8 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
             type="date"
             id="date"
             value={formData.date}
-            onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -137,7 +139,7 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
         <div className="flex gap-3 pt-2">
           <button
             type="submit"
-            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
           >
             {isEditing ? "Update Expense" : "Add Expense"}
           </button>
@@ -146,7 +148,7 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
             <button
               type="button"
               onClick={handleCancel}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>

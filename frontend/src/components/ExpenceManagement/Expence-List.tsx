@@ -2,8 +2,6 @@
 
 import { Expense } from "./Expence"
 
-
-
 interface ExpenseListProps {
   expenses: Expense[]
   onEdit: (expense: Expense) => void
@@ -41,7 +39,6 @@ export default function ExpenseList({
       <div className="p-6 border-b border-gray-200">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Expense List</h2>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
@@ -51,7 +48,7 @@ export default function ExpenseList({
               id="category-filter"
               value={filterCategory}
               onChange={(e) => onFilterChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Categories</option>
               <option value="Food">Food</option>
@@ -71,7 +68,7 @@ export default function ExpenseList({
                 id="start-date"
                 value={dateRange.start}
                 onChange={(e) => onDateRangeChange({ ...dateRange, start: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -83,7 +80,7 @@ export default function ExpenseList({
                 id="end-date"
                 value={dateRange.end}
                 onChange={(e) => onDateRangeChange({ ...dateRange, end: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -111,7 +108,7 @@ export default function ExpenseList({
                       {expense.category}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500">{expense.date}</p>
+                  <p className="text-sm text-gray-500">{new Date(expense.date).toLocaleDateString()}</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -120,13 +117,13 @@ export default function ExpenseList({
                   <div className="flex gap-2">
                     <button
                       onClick={() => onEdit(expense)}
-                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(expense.id, expense.title)}
-                      className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+                      className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
                     >
                       Delete
                     </button>

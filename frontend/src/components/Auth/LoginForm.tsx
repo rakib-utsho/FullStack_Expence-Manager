@@ -31,7 +31,7 @@ export default function LoginForm() {
     try {
       const res = await login({ email, password }).unwrap();
       console.log("Login response:", res);
-      if (!res.success) {
+      if (res.success) {
         Cookies.set("accessToken", res.data.accessToken, { expires: 7 });
         Cookies.set("refreshToken", res.data.refreshToken, { expires: 30 }); //
         const user = res?.data?.user;

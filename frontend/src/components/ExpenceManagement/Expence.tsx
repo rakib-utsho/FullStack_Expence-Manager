@@ -1,95 +1,94 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import ExpenseForm from "./ExpenceForm"
-import ExpenseStats from "./Expence-Status"
-import ExpenseChart from "./Expence-Chart"
-import ExpenseList from "./Expence-List"
+import { useState } from "react";
+import ExpenseForm from "./ExpenceForm";
+import ExpenseStats from "./Expence-Status";
+import ExpenseChart from "./Expence-Chart";
+import ExpenseList from "./Expence-List";
 
+import {
+  useCreateExpenseMutation,
+  useDeleteExpenseMutation,
+  useGetExpensesQuery,
+  useUpdateExpenseMutation,
+} from "@/redux/service/expence/expenceApi";
+import { useGetProfileQueryQuery } from "@/redux/service/auth/authApi";
 
 export interface Expense {
-  id: string
-  title: string
-  amount: number
-  category: "Food" | "Transport" | "Shopping" | "Others"
-  date: string
-  createdAt: Date
+  id: string;
+  title: string;
+  amount: number;
+  category: "Food" | "Transport" | "Shopping" | "Others";
+  date: string;
+  createdAt: string;
 }
 
 export default function ExpenseTracker() {
-  const [user, setUser] = useState<| null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [expenses, setExpenses] = useState<Expense[]>([])
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
-  const [filterCategory, setFilterCategory] = useState<string>("all")
-  const [dateRange, setDateRange] = useState({ start: "", end: "" })
-  const router = useRouter()
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
-  // Check authentication on mount
-//   useEffect(() => {
-//     const currentUser = 
-//     if (!currentUser) {
-//       router.push("/login")
-//     } else {
-//       setUser(currentUser)
-//     }
-//     setIsLoading(false)
-//   }, [router])
+  // RTK Query hooks
+  const { data: expensesData, isLoading } = useGetExpensesQuery({});
+  const [createExpense] = useCreateExpenseMutation();
+  const [updateExpense] = useUpdateExpenseMutation();
+  const [deleteExpense] = useDeleteExpenseMutation();
+  const { data: userData } = useGetProfileQueryQuery({});
 
-  // Load expenses from localStorage on mount
-  useEffect(() => {
-    if (user) {
-      const savedExpenses = localStorage.getItem(`expenses_${user.id}`)
-      if (savedExpenses) {
-        const parsed = JSON.parse(savedExpenses)
-        setExpenses(
-          parsed.map((exp: any) => ({
-            ...exp,
-            createdAt: new Date(exp.createdAt),
-          })),
-        )
-      }
+  console.log(userData);
+
+  const expenses = expensesData?.data || [];
+
+  // Add new expense
+  const addExpense = async (expenseData: Omit<Expense, "id" | "createdAt">) => {
+    try {
+      await createExpense({
+        ...expenseData,
+        date: new Date(expenseData.date).toISOString(), // convert to ISO
+      }).unwrap();
+    } catch (error) {
+      console.error("Error adding expense:", error);
     }
-  }, [user])
+  };
 
-  // Save expenses to localStorage whenever expenses change
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(`expenses_${user.id}`, JSON.stringify(expenses))
+  // Update existing expense
+  const handleUpdateExpense = async (
+    id: string,
+    expenseData: Omit<Expense, "id" | "createdAt">
+  ) => {
+    try {
+      await updateExpense({
+        id,
+        body: {
+          ...expenseData,
+          date: new Date(expenseData.date).toISOString(),
+        }, // convert to ISO
+      }).unwrap();
+      setEditingExpense(null);
+    } catch (error) {
+      console.error("Error updating expense:", error);
     }
-  }, [expenses, user])
+  };
 
-  const handleLogout = () => {
-    logout()
-    router.push("/login")
-  }
-
-  const addExpense = (expenseData: Omit<Expense, "id" | "createdAt">) => {
-    const newExpense: Expense = {
-      ...expenseData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
+  // Delete expense
+  const handleDeleteExpense = async (id: string) => {
+    try {
+      await deleteExpense(id).unwrap();
+    } catch (error) {
+      console.error("Error deleting expense:", error);
     }
-    setExpenses((prev) => [newExpense, ...prev])
-  }
+  };
 
-  const updateExpense = (id: string, expenseData: Omit<Expense, "id" | "createdAt">) => {
-    setExpenses((prev) => prev.map((exp) => (exp.id === id ? { ...exp, ...expenseData } : exp)))
-    setEditingExpense(null)
-  }
-
-  const deleteExpense = (id: string) => {
-    setExpenses((prev) => prev.filter((exp) => exp.id !== id))
-  }
-
-  const filteredExpenses = expenses.filter((expense) => {
-    const categoryMatch = filterCategory === "all" || expense.category === filterCategory
+  // Filter expenses by category and date
+  const filteredExpenses = expenses?.filter((expense) => {
+    const categoryMatch =
+      filterCategory === "all" || expense.category === filterCategory;
     const dateMatch =
-      (!dateRange.start || expense.date >= dateRange.start) && (!dateRange.end || expense.date <= dateRange.end)
-    return categoryMatch && dateMatch
-  })
+      (!dateRange.start ||
+        expense.date >= new Date(dateRange.start).toISOString()) &&
+      (!dateRange.end || expense.date <= new Date(dateRange.end).toISOString());
+    return categoryMatch && dateMatch;
+  });
 
   if (isLoading) {
     return (
@@ -99,11 +98,7 @@ export default function ExpenseTracker() {
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
-    )
-  }
-
-  if (!user) {
-    return null // Will redirect to login
+    );
   }
 
   return (
@@ -111,22 +106,22 @@ export default function ExpenseTracker() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <header className="flex justify-between items-center mb-8">
           <div className="text-center flex-1">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Expense Tracker</h1>
-            <p className="text-gray-600">Welcome back, {user.name}!</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Expense Tracker
+            </h1>
+            <p className="text-gray-600">Track your expenses efficiently</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-          >
-            Logout
-          </button>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Form */}
           <div className="lg:col-span-1">
             <ExpenseForm
-              onSubmit={editingExpense ? (data) => updateExpense(editingExpense.id, data) : addExpense}
+              onSubmit={
+                editingExpense
+                  ? (data) => handleUpdateExpense(editingExpense.id, data)
+                  : addExpense
+              }
               initialData={editingExpense}
               isEditing={!!editingExpense}
               onCancel={() => setEditingExpense(null)}
@@ -137,12 +132,12 @@ export default function ExpenseTracker() {
           <div className="lg:col-span-2 space-y-6">
             <ExpenseStats expenses={filteredExpenses} />
 
-            {expenses.length > 0 && <ExpenseChart expenses={expenses} />}
+            {expenses?.length > 0 && <ExpenseChart expenses={expenses} />}
 
             <ExpenseList
               expenses={filteredExpenses}
               onEdit={setEditingExpense}
-              onDelete={deleteExpense}
+              onDelete={handleDeleteExpense}
               filterCategory={filterCategory}
               onFilterChange={setFilterCategory}
               dateRange={dateRange}
@@ -152,5 +147,5 @@ export default function ExpenseTracker() {
         </div>
       </div>
     </div>
-  )
+  );
 }

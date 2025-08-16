@@ -2,8 +2,6 @@
 
 import { Expense } from "./Expence"
 
-
-
 interface ExpenseStatsProps {
   expenses: Expense[]
 }
@@ -11,8 +9,7 @@ interface ExpenseStatsProps {
 export default function ExpenseStats({ expenses }: ExpenseStatsProps) {
   const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0)
 
-
-  const thisMonth = new Date().toISOString().slice(0, 7) // YYYY-MM format
+  const thisMonth = new Date().toISOString().slice(0, 7)
   const thisMonthExpenses = expenses.filter((expense) => expense.date.startsWith(thisMonth))
   const thisMonthTotal = thisMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0)
 
