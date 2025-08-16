@@ -1,53 +1,62 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-import ExpenseForm from "./ExpenceForm";
-import ExpenseStats from "./Expence-Status";
-import ExpenseChart from "./Expence-Chart";
-import ExpenseList from "./Expence-List";
-
+import { redirect } from "next/navigation";
+import ExpenseForm from "./ExpenseForm";
+import ExpenseStats from "./Expense-Status";
+import ExpenseChart from "./Expense-Chart";
+import ExpenseList from "./Expense-List";
 import {
   useCreateExpenseMutation,
   useDeleteExpenseMutation,
   useGetExpensesQuery,
   useUpdateExpenseMutation,
 } from "@/redux/service/expence/expenceApi";
-import { useGetProfileQueryQuery } from "@/redux/service/auth/authApi";
+import { Expense } from "@/types/expense";
+import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
-export interface Expense {
-  id: string;
-  title: string;
-  amount: number;
-  category: "Food" | "Transport" | "Shopping" | "Others";
-  date: string;
-  createdAt: string;
-}
+import { logout } from "@/redux/features/auth";
 
 export default function ExpenseTracker() {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // RTK Query hooks
-  const { data: expensesData, isLoading } = useGetExpensesQuery({});
+  const { data: expensesData, isLoading, refetch } = useGetExpensesQuery({});
   const [createExpense] = useCreateExpenseMutation();
   const [updateExpense] = useUpdateExpenseMutation();
   const [deleteExpense] = useDeleteExpenseMutation();
-  const { data: userData } = useGetProfileQueryQuery({});
 
-  console.log(userData);
-
-  const expenses = expensesData?.data || [];
+  // Ensure expenses is always Expense[]
+  const expenses: Expense[] = (
+    Array.isArray(expensesData?.data)
+      ? expensesData.data
+      : expensesData?.data
+      ? [expensesData.data]
+      : []
+  ).map((exp) => ({
+    ...exp,
+    category: exp.category as Expense["category"],
+  }));
 
   // Add new expense
   const addExpense = async (expenseData: Omit<Expense, "id" | "createdAt">) => {
     try {
-      await createExpense({
+      const res = await createExpense({
         ...expenseData,
-        date: new Date(expenseData.date).toISOString(), // convert to ISO
+        date: new Date(expenseData.date).toISOString(),
       }).unwrap();
-    } catch (error) {
-      console.error("Error adding expense:", error);
+      toast.success(res?.message || "Expense added successfully");
+      setEditingExpense(null);
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to add expense");
     }
   };
 
@@ -57,15 +66,18 @@ export default function ExpenseTracker() {
     expenseData: Omit<Expense, "id" | "createdAt">
   ) => {
     try {
-      await updateExpense({
+      const res = await updateExpense({
         id,
         body: {
           ...expenseData,
           date: new Date(expenseData.date).toISOString(),
-        }, // convert to ISO
+        },
       }).unwrap();
+      toast.success(res?.message || "Expense updated successfully");
       setEditingExpense(null);
-    } catch (error) {
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update expense");
       console.error("Error updating expense:", error);
     }
   };
@@ -73,14 +85,17 @@ export default function ExpenseTracker() {
   // Delete expense
   const handleDeleteExpense = async (id: string) => {
     try {
-      await deleteExpense(id).unwrap();
-    } catch (error) {
+      const res = await deleteExpense(id).unwrap();
+      toast.success(res?.message || "Expense deleted successfully");
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete expense");
       console.error("Error deleting expense:", error);
     }
   };
 
-  // Filter expenses by category and date
-  const filteredExpenses = expenses?.filter((expense) => {
+  // Filter expenses
+  const filteredExpenses = expenses.filter((expense) => {
     const categoryMatch =
       filterCategory === "all" || expense.category === filterCategory;
     const dateMatch =
@@ -103,7 +118,7 @@ export default function ExpenseTracker() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-8">
           <div className="text-center flex-1">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -111,6 +126,23 @@ export default function ExpenseTracker() {
             </h1>
             <p className="text-gray-600">Track your expenses efficiently</p>
           </div>
+          {user?.email && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user?.name}
+              </span>
+              <button
+                onClick={() => {
+                  dispatch(logout());
+                  redirect("/login");       
+                  toast.success("Logged out successfully");
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -132,7 +164,7 @@ export default function ExpenseTracker() {
           <div className="lg:col-span-2 space-y-6">
             <ExpenseStats expenses={filteredExpenses} />
 
-            {expenses?.length > 0 && <ExpenseChart expenses={expenses} />}
+            {expenses.length > 0 && <ExpenseChart expenses={expenses} />}
 
             <ExpenseList
               expenses={filteredExpenses}

@@ -1,6 +1,6 @@
 "use client"
 
-import { Expense } from "./Expence"
+import { Expense } from "@/types/expense"
 
 interface ExpenseListProps {
   expenses: Expense[]
@@ -33,6 +33,13 @@ export default function ExpenseList({
       onDelete(id)
     }
   }
+
+  const clearFilters = () => {
+    onFilterChange("all")
+    onDateRangeChange({ start: "", end: "" })
+  }
+
+  const hasFilters = filterCategory !== "all" || dateRange.start || dateRange.end
 
   return (
     <div className="bg-white rounded-lg shadow-md">
@@ -85,6 +92,20 @@ export default function ExpenseList({
             </div>
           </div>
         </div>
+
+        {hasFilters && (
+          <div className="mt-4">
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="p-6">

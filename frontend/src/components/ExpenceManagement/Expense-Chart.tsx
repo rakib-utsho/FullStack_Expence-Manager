@@ -1,9 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { Expense } from "@/types/expense"
 import { useMemo } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
-import { Expense } from "./Expence"
+
+interface ChartDataItem {
+  category: string;
+  amount: number;
+  percentage: number;
+  color: string;
+}
 
 interface ExpenseChartProps {
   expenses: Expense[]
@@ -17,7 +24,7 @@ const categoryColors = {
 }
 
 export default function ExpenseChart({ expenses }: ExpenseChartProps) {
-  const chartData = useMemo(() => {
+  const chartData = useMemo<ChartDataItem[]>(() => {
     const categoryTotals = expenses.reduce(
       (acc, expense) => {
         acc[expense.category] = (acc[expense.category] || 0) + expense.amount
@@ -38,7 +45,13 @@ export default function ExpenseChart({ expenses }: ExpenseChartProps) {
 
   if (chartData.length === 0) return null
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active?: boolean;
+    payload?: { payload: ChartDataItem }[];
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
@@ -78,11 +91,16 @@ export default function ExpenseChart({ expenses }: ExpenseChartProps) {
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
                 <Legend
-                  formatter={(value, entry) => (
-                    <span style={{ color: entry.color }}>
-                      {value} (${entry.payload.amount.toFixed(2)})
-                    </span>
-                  )}
+                  formatter={(value) => {
+                    const data = chartData.find(item => item.category === value);
+                    const amount = data ? data.amount : 0;
+                    const color = data ? data.color : "#000";
+                    return (
+                      <span style={{ color }}>
+                        {value} (${amount.toFixed(2)})
+                      </span>
+                    );
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>

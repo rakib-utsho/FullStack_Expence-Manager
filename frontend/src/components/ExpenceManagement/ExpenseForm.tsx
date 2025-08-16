@@ -1,23 +1,31 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Expense } from "./Expence"
+import { Expense } from "@/types/expense";
+import { useState, useEffect } from "react";
 
 interface ExpenseFormProps {
-  onSubmit: (data: Omit<Expense, "id" | "createdAt">) => void
-  initialData?: Expense | null
-  isEditing?: boolean
-  onCancel?: () => void
+  onSubmit: (data: Omit<Expense, "id" | "createdAt">) => void;
+  initialData: Expense | null;
+  isEditing: boolean;
+  onCancel: () => void;
 }
 
-export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel }: ExpenseFormProps) {
-  const [formData, setFormData] = useState({
-    title: "",
-    amount: "",
-    category: "Food" as Expense["category"],
-    date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
-  })
+const defaultFormData = {
+  title: "",
+  amount: "",
+  category: "Food" as Expense["category"],
+  date: new Date().toISOString().split("T")[0],
+};
 
+export default function ExpenseForm({
+  onSubmit,
+  initialData,
+  isEditing,
+  onCancel,
+}: ExpenseFormProps) {
+  const [formData, setFormData] = useState(defaultFormData);
+
+  // Reset form when initialData changes
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -25,46 +33,46 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
         amount: initialData.amount.toString(),
         category: initialData.category,
         date: initialData.date.split("T")[0],
-      })
+      });
+    } else {
+      setFormData(defaultFormData);
     }
-  }, [initialData])
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.title.trim() || !formData.amount || Number.parseFloat(formData.amount) <= 0) {
-      alert("Please fill in all fields with valid values")
-      return
+      alert("Please fill in all fields with valid values");
+      return;
     }
-
-    // Convert date to ISO before submitting
-    const isoDate = new Date(formData.date).toISOString()
 
     onSubmit({
       title: formData.title.trim(),
       amount: Number.parseFloat(formData.amount),
       category: formData.category,
-      date: isoDate,
-    })
+      date: new Date(formData.date).toISOString(),
+    });
 
+    // Only reset if not in editing mode
     if (!isEditing) {
-      setFormData({
-        title: "",
-        amount: "",
-        category: "Food",
-        date: new Date().toISOString().split("T")[0],
-      })
+      setFormData(defaultFormData);
     }
-  }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleCancel = () => {
-    setFormData({
-      title: "",
-      amount: "",
-      category: "Food",
-      date: new Date().toISOString().split("T")[0],
-    })
-    onCancel?.()
-  }
+    setFormData(defaultFormData);
+    onCancel();
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -80,8 +88,9 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
           <input
             type="text"
             id="title"
+            name="title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter expense title"
             required
@@ -95,10 +104,11 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
           <input
             type="number"
             id="amount"
+            name="amount"
             step="0.01"
             min="0.01"
             value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="0.00"
             required
@@ -111,8 +121,9 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
           </label>
           <select
             id="category"
+            name="category"
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value as Expense["category"] })}
+            onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="Food">Food</option>
@@ -129,8 +140,9 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
           <input
             type="date"
             id="date"
+            name="date"
             value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
@@ -156,5 +168,5 @@ export default function ExpenseForm({ onSubmit, initialData, isEditing, onCancel
         </div>
       </form>
     </div>
-  )
+  );
 }

@@ -44,10 +44,11 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
-    getProfileQuery: builder.query({
+    getProfile: builder.query<AuthResponse, void>({
       query: () => ({
         url: "/auth/get-user-info",
         method: "GET",
+        credentials: 'include', // This is crucial for sending cookies
       }),
     }),
   }),
@@ -56,5 +57,5 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterMutation,
-  useGetProfileQueryQuery,
+  useGetProfileQuery, // Fixed the hook name
 } = authApi;

@@ -16,9 +16,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ARC (Allied Restoration Contractors)",
-  description:
-    "Award Winning Service Allied Restoration Contractors, Repairs & Replacement",
+  title: "Personal Expense Manager",
+  description: "Manage your personal expenses efficiently with our Expense Manager app.",
 };
 
 export default function RootLayout({

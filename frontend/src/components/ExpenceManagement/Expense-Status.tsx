@@ -1,6 +1,8 @@
 "use client"
 
-import { Expense } from "./Expence"
+import { Expense } from "@/types/expense"
+
+
 
 interface ExpenseStatsProps {
   expenses: Expense[]

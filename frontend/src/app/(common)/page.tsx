@@ -1,8 +1,8 @@
 // import ExpenseTracker from "@/components/ExpenceManagement/Expence";
 
-import ExpenseTracker from "@/components/ExpenceManagement/Expence";
+import ExpenseTracker from "@/components/ExpenceManagement/Expense";
 
-const HompPage = () => {
+const HomePage = () => {
   return (
     <div className="container">
       <ExpenseTracker />
@@ -10,4 +10,4 @@ const HompPage = () => {
   );
 };
 
-export default HompPage;
+export default HomePage;

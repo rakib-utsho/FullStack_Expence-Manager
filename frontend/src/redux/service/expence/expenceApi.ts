@@ -8,7 +8,7 @@ export interface Expense {
   amount: number;
   category: string;
   date: string;
-  type: "INCOME" | "EXPENSE";
+  type: "EXPENSE";
   method: string;
   userId: string;
   createdAt: string;
@@ -67,7 +67,7 @@ export const expensesApi = baseApi.injectEndpoints({
     >({
       query: ({ id, body }) => ({
         url: `/expenses/${id}`,
-        method: "PUT",
+        method: "PATCH",
         body,
       }),
     }),
