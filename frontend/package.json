@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
+    "@headlessui/react": "^2.2.7",
+    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^3.9.1",
     "@nextui-org/react": "^2.4.8",
     "@reduxjs/toolkit": "^2.4.0",

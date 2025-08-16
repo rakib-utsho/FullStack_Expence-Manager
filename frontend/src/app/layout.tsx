@@ -36,17 +36,17 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning={true}
-        className={`${inter.variable} antialiased !bg-gray-50`}
+        className={`${inter.variable} antialiased !bg-white`}
       >
         <NextUiProvider>
           <ReduxProvider>
             <>
-              <div className="min-h-screen grid grid-rows-[auto_1fr_auto] max-w-[100vw] overflow-hidden">
+            <Toaster richColors position="top-center" />
+              <div className="min-h-screen grid grid-rows-[auto_1fr_auto] max-w-[100vw] overflow-hidden bg-[#dedad7]">
                 <FacebookPixel />
                 {children}
               </div>
               <ScrollToTopButton />
-              <Toaster />
             </>
           </ReduxProvider>
         </NextUiProvider>
