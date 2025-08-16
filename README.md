@@ -14,7 +14,6 @@ Frontend: [https://personalexpencemanager-frontend.vercel.app](https://personale
 - 🔍 Filter and search expenses
 - 📱 Responsive design for all devices
 - ⚡ Real-time updates
-- 🌙 Light/Dark mode support
 
 ## Tech Stack
 
