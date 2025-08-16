@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { Expense } from "@/types/expense"
+import { Expense } from "@/types/expense";
 
 interface ExpenseListProps {
-  expenses: Expense[]
-  onEdit: (expense: Expense) => void
-  onDelete: (id: string) => void
-  filterCategory: string
-  onFilterChange: (category: string) => void
-  dateRange: { start: string; end: string }
-  onDateRangeChange: (range: { start: string; end: string }) => void
+  expenses: Expense[];
+  onEdit: (expense: Expense) => void;
+  onDelete: (id: string) => void;
+  filterCategory: string;
+  onFilterChange: (category: string) => void;
+  dateRange: { start: string; end: string };
+  onDateRangeChange: (range: { start: string; end: string }) => void;
 }
 
 const categoryColors = {
@@ -17,7 +17,7 @@ const categoryColors = {
   Transport: "bg-blue-100 text-blue-800",
   Shopping: "bg-purple-100 text-purple-800",
   Others: "bg-gray-100 text-gray-800",
-}
+};
 
 export default function ExpenseList({
   expenses,
@@ -28,27 +28,31 @@ export default function ExpenseList({
   dateRange,
   onDateRangeChange,
 }: ExpenseListProps) {
-  const handleDelete = (id: string, title: string) => {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      onDelete(id)
-    }
-  }
+  const handleDelete = (id: string) => {
+    onDelete(id);
+  };
 
   const clearFilters = () => {
-    onFilterChange("all")
-    onDateRangeChange({ start: "", end: "" })
-  }
+    onFilterChange("all");
+    onDateRangeChange({ start: "", end: "" });
+  };
 
-  const hasFilters = filterCategory !== "all" || dateRange.start || dateRange.end
+  const hasFilters =
+    filterCategory !== "all" || dateRange.start || dateRange.end;
 
   return (
     <div className="bg-white rounded-lg shadow-md">
       <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Expense List</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Expense List
+        </h2>
 
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
-            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="category-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Filter by Category
             </label>
             <select
@@ -67,26 +71,36 @@ export default function ExpenseList({
 
           <div className="flex gap-2">
             <div>
-              <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="start-date"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 From
               </label>
               <input
                 type="date"
                 id="start-date"
                 value={dateRange.start}
-                onChange={(e) => onDateRangeChange({ ...dateRange, start: e.target.value })}
+                onChange={(e) =>
+                  onDateRangeChange({ ...dateRange, start: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="end-date"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 To
               </label>
               <input
                 type="date"
                 id="end-date"
                 value={dateRange.end}
-                onChange={(e) => onDateRangeChange({ ...dateRange, end: e.target.value })}
+                onChange={(e) =>
+                  onDateRangeChange({ ...dateRange, end: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -99,8 +113,19 @@ export default function ExpenseList({
               onClick={clearFilters}
               className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
               Clear Filters
             </button>
@@ -113,7 +138,9 @@ export default function ExpenseList({
           <div className="text-center py-8">
             <div className="text-gray-400 text-5xl mb-4">💸</div>
             <p className="text-gray-500 text-lg">No expenses found</p>
-            <p className="text-gray-400">Add your first expense to get started</p>
+            <p className="text-gray-400">
+              Add your first expense to get started
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -124,16 +151,26 @@ export default function ExpenseList({
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-medium text-gray-900">{expense.title}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${categoryColors[expense.category]}`}>
+                    <h3 className="font-medium text-gray-900">
+                      {expense.title}
+                    </h3>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        categoryColors[expense.category]
+                      }`}
+                    >
                       {expense.category}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500">{new Date(expense.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(expense.date).toLocaleDateString()}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold text-gray-900">${expense.amount.toFixed(2)}</span>
+                  <span className="text-lg font-semibold text-gray-900">
+                    ${expense.amount.toFixed(2)}
+                  </span>
 
                   <div className="flex gap-2">
                     <button
@@ -143,7 +180,7 @@ export default function ExpenseList({
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(expense.id, expense.title)}
+                      onClick={() => handleDelete(expense.id)}
                       className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
                     >
                       Delete
@@ -156,5 +193,5 @@ export default function ExpenseList({
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -42,7 +42,7 @@ export default function RootLayout({
           <ReduxProvider>
             <>
             <Toaster richColors position="top-center" />
-              <div className="min-h-screen grid grid-rows-[auto_1fr_auto] max-w-[100vw] overflow-hidden">
+              <div className="min-h-screen grid grid-rows-[auto_1fr_auto] max-w-[100vw] overflow-hidden bg-gray-50">
                 <FacebookPixel />
                 {children}
               </div>
