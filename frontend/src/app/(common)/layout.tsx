@@ -7,9 +7,9 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "ARC (Allied Restoration Contractors)",
+  title: "Personal Expense Manager",
   description:
-    "Award Winning Service Allied Restoration Contractors, Repairs & Replacement",
+    "Manage your personal expenses efficiently with our Expense Manager app.",
 };
 
 export default function RootLayout({

@@ -9,7 +9,7 @@ import { RootState } from "../store";
 // import { logout, setAccessToken } from "../features/auth";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "https://expense-tracker-backend-indol-five.vercel.app/api/v1",
+  baseUrl: "https://expence-tracker-backend-two.vercel.app/api/v1",
 
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth?.accessToken;
